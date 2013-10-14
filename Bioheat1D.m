@@ -16,6 +16,7 @@ function [tmap]=Bioheat1D(P,dom,source)
 R1=0.0015/2; % (m) R1 is the distance from the isotropic laser source point and the edge of the fiber
 R2=1; % (m) R2 is the maximum edge of the domain;
 time=length(P); %Returns how many timesteps will be calculated
+P=P/source.n;  %Scales the power to the number of source points
 
 %List of constants
 mua=500; % 1/m
@@ -27,9 +28,9 @@ u0=37+273.15; % K
 ua=37+273.15; % K
 
 %Points structure
-points.x=linspace(-dom.x/2,dom.pointx,dom.x/2);
-points.y=linspace(-dom.y/2,dom.pointy,dom.y/2);
-points.z=linspace(-dom.z/2,dom.pointz,dom.z/2);
+points.x=linspace(-dom.x/2,dom.x/2,dom.pointx);
+points.y=linspace(-dom.y/2,dom.y/2,dom.pointy);
+points.z=linspace(-dom.z/2,dom.z/2,dom.pointz);
 
 %Initialize tmap, t_sample, and r
 tmap=zeros(dom.pointx,dom.pointy,dom.pointz);
@@ -38,7 +39,7 @@ r=zeros(source.n,1);
 
 %Spatial locations of the sources; My convention is that the long axis of
 %the laser is parallel to the y-axis.
-laser=linspace(-source.length/2,source.n,source.length/2);
+laser=linspace(-source.length/2,source.length/2,source.n);
 
 %Giant for loop vector for each source, calculate the t_sample
 for i=1:dom.pointx
