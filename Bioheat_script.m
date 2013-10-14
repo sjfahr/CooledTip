@@ -3,15 +3,17 @@
 P=[1 5]; %Power
 
 %Define the domain
-dom.x=0.2;
-dom.y=dom.x;
-dom.z=0;
-dom.pointx=51;
-dom.pointy=dom.pointx;
-dom.pointz=1;
+mod_point=[51 51 1];
 
-%Define the source
-source.n=5;
-source.length=0.01;
+matrix=[256 256 1];
 
-[tmap]=Bioheat1D(P,dom,source);
+scaling=[1 1 1];
+
+FOV=[0.25 0.25 0.007];  %change for image/dataset
+
+[dom,dom_point,MRTI_pix,mod_pix]=modeled_domain_array(FOV,matrix,scaling,mod_point);
+
+dom
+dom_point
+MRTI_pix
+mod_pix
