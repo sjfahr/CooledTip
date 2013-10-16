@@ -10,7 +10,7 @@
 %the number of sources. The 'length' is the diffusing tip length, commonly
 %0.01 m.
 
-function [tmap]=Bioheat1D(P,dom,source)
+function [tmap]=Bioheat1D_array(unique_P,dom,dom_point,source);
 
 %List of space and time details
 R1=0.0015/2; % (m) R1 is the distance from the isotropic laser source point and the edge of the fiber
@@ -28,12 +28,10 @@ u0=37+273.15; % K
 ua=37+273.15; % K
 
 %Points structure
-points.x=linspace(-dom.x/2,dom.x/2,dom.pointx);
-points.y=linspace(-dom.y/2,dom.y/2,dom.pointy);
-points.z=linspace(-dom.z/2,dom.z/2,dom.pointz);
+points=linspace(-dom/2,dom/2,dom_point);
 
 %Initialize tmap, t_sample, and r
-tmap=zeros(dom.pointx,dom.pointy,dom.pointz);
+tmap=zeros(dom_point);
 t_sample=zeros(source.n,time);
 r=zeros(source.n,1);
 
@@ -42,17 +40,17 @@ r=zeros(source.n,1);
 laser=linspace(-source.length/2,source.length/2,source.n);
 
 %Giant for loop vector for each source, calculate the t_sample
-for i=1:dom.pointx
+for i=1:dom_point(1)
     
-    for ii=1:dom.pointy
+    for ii=1:dom_point(2)
         
-        for iii=1:dom.pointz
+        for iii=1:dom_point(3)
             
             for j=1:source.n
                 r(j)=sqrt(points.x(i)^2+(laser(j)-points.y(ii))^2+points.z(iii)^2);
                 
-                for jj=1:time
-                    [t_sample(j,jj)]=sammodel1D(u0,ua,i,w,P(jj),r(j),mua,mus,R1,R2,g);
+                for jj=1:max(size(unique_P))
+                    [t_sample(j,jj)]=sammodel1D(u0,ua,k,w,unique_P(jj),r(j),mua,mus,R1,R2,g);
                     tmap(i,ii,iii,jj)=sum(t_sample(j,jj,1));
                 end
             end
