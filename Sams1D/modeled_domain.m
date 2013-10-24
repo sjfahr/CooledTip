@@ -13,9 +13,9 @@ dom.y=FOV.y*mod_point.y/matrix.y;
 dom.z=FOV.z*mod_point.z/matrix.z;
 
 %Modeled domain points
-dom.pointx=mod_point.x*scaling.x;
-dom.pointy=mod_point.y*scaling.y;
-dom.pointz=mod_point.z*scaling.z;
+dom.pointy=floor(mod_point.x*scaling.x);
+dom.pointx=floor(mod_point.y*scaling.y);
+dom.pointz=floor(mod_point.z*scaling.z);
 
 %Find the MRTI pixel size
 MRTI_pix.x=FOV.x/matrix.x;

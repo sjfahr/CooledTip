@@ -15,8 +15,10 @@ function [tmap]=Bioheat1D(P,dom,source);
 %List of space and time details
 R1=0.0015/2; % (m) R1 is the distance from the isotropic laser source point and the edge of the fiber
 R2=1; % (m) R2 is the maximum edge of the domain;
-time=length(P); %Returns how many timesteps will be calculated
-P=P/source.n;  %Scales the power to the number of source points
+Npowers=size(P,1)+1; %Returns how many timesteps will be calculated
+P(2:Npowers,:)=P(1:(Npowers-1),:); %Inserts the P=0 timestep
+P(1,:)=0;
+P(:,2)=P(:,2)/source.n;  %Scales the power to the number of source points
 
 %List of constants
 mua=500; % 1/m
@@ -24,8 +26,8 @@ mus=14000; %1/m
 g=0.88; % Unity
 k=0.527; % W/(m * K)
 w=6; % kg / (m^3 * s)
-u0=37+273.15; % K
-ua=37+273.15; % K
+u0=0; % K
+ua=0; % K
 
 %Points structure
 points.x=linspace(-dom.x/2,dom.x/2,dom.pointx);
@@ -33,13 +35,13 @@ points.y=linspace(-dom.y/2,dom.y/2,dom.pointy);
 points.z=linspace(-dom.z/2,dom.z/2,dom.pointz);
 
 %Initialize tmap, t_sample, and r
-tmap=zeros(dom.pointx,dom.pointy,dom.pointz,(size(P,1)+1));
-t_sample=zeros(source.n,time);
+
+t_sample=zeros(dom.pointx,dom.pointy,dom.pointz,source.n,Npowers);
 r=zeros(source.n,1);
-tmap(:,:,:,1)=273.15+37;
+
 %Spatial locations of the sources; My convention is that the long axis of
 %the laser is parallel to the y-axis.
-laser=linspace(-source.length/2,source.length/2,source.n);
+%laser=linspace((-source.length/2),(source.length/2),source.n);
 
 %Giant for loop vector for each source, calculate the t_sample
 for i=1:dom.pointx   %Spatial loop for i, ii, iii
@@ -49,15 +51,18 @@ for i=1:dom.pointx   %Spatial loop for i, ii, iii
         for iii=1:dom.pointz
             
             for j=1:source.n    %Loop for the separate isotropic sources
-                r(j)=sqrt(points.x(i)^2+(laser(j)-points.y(ii))^2+points.z(iii)^2);  %Distance for each isotropic source
+                r(j)=sqrt(points.x(i)^2+(source.laser(j)-points.y(ii))^2+points.z(iii)^2);  %Distance for each isotropic source
                 
-                for jj=2:(size(P,1)+1)  %Loop for the unique power settings
-                    [t_sample(j,jj)]=sammodel1D(u0,ua,k,w,P(jj),r(j),mua,mus,R1,R2,g);
-                    tmap(i,ii,iii,jj)=sum(t_sample(j,jj));  %sum(t_sample(j,jj,1));
+                for jj=2:Npowers  %Loop for the unique power settings;.
+                    [t_sample(i,ii,iii,j,jj)]=sammodel1D(u0,ua,k,w,P(jj,2),r(j),mua,mus,R1,R2,g);
+                    
                 end
+                
             end
         end
     end
 end
+
+tmap=sum(t_sample,4);  %sum(t_sample(j,jj,1));
 
 end
