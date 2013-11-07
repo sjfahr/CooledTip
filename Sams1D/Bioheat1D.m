@@ -10,7 +10,7 @@
 %the number of sources. The 'length' is the diffusing tip length, commonly
 %0.01 m.
 
-function [tmap]=Bioheat1D(P,dom,source);
+function [tmap]=Bioheat1D(P,dom,source,w,k,g,mua,mus,probe_u,robin_co);
 
 %List of space and time details
 R1=0.0015/2; % (m) R1 is the distance from the isotropic laser source point and the edge of the fiber
@@ -21,11 +21,11 @@ P(1,:)=0;
 P(:,2)=P(:,2)/source.n;  %Scales the power to the number of source points
 
 %List of constants
-mua=500; % 1/m
-mus=14000; %1/m
-g=0.88; % Unity
-k=0.527; % W/(m * K)
-w=6; % kg / (m^3 * s)
+% mua=500; % 1/m
+% mus=14000; %1/m
+% g=0.88; % Unity
+% k=0.527; % W/(m * K)
+% w=6; % kg / (m^3 * s)
 u0=0; % K
 ua=0; % K
 
@@ -43,7 +43,8 @@ r=zeros(source.n,1);
 %the laser is parallel to the y-axis.
 %laser=linspace((-source.length/2),(source.length/2),source.n);
 
-%Giant for loop vector for each source, calculate the t_sample
+%Giant for loop vector for each source, calculate the t_sample; i, ii, iii
+%are spatial; j and jj are non-spatial
 for i=1:dom.pointx   %Spatial loop for i, ii, iii
     
     for ii=1:dom.pointy
@@ -57,7 +58,6 @@ for i=1:dom.pointx   %Spatial loop for i, ii, iii
                     [t_sample(i,ii,iii,j,jj)]=sammodel1D(u0,ua,k,w,P(jj,2),r(j),mua,mus,R1,R2,g);
                     
                 end
-                
             end
         end
     end
